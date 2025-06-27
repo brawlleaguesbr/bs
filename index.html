@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Leagues - Dashboard</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --primary: #ffd700;
+            --secondary: #ff4500;
+            --text: #ffffff;
+            --success: #4caf50;
+            --danger: #f44336;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--primary);
+            position: relative;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+            opacity: 0.7;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s;
+        }
+        
+        h1:hover {
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.2s; }
+        .stat-card:nth-child(2) { animation-delay: 0.4s; }
+        .stat-card:nth-child(3) { animation-delay: 0.6s; }
+        .stat-card:nth-child(4) { animation-delay: 0.8s; }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,69,0,0.05) 100%);
+            z-index: 0;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+            position: relative;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+            position: relative;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+        
+        .trend-up {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .trend-down {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        .divisions {
+            margin-top: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .division-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .division-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .division-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .division-card:hover::after {
+            width: 5px;
+        }
+        
+        .division-name {
+            font-weight: bold;
+            color: var(--primary);
+            position: relative;
+        }
+        
+        .division-trophies {
+            font-size: 1.2rem;
+            position: relative;
+        }
+        
+        .events {
+            margin-top: 40px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .event-card {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--secondary);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .event-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-left-width: 6px;
+        }
+        
+        .event-title {
+            color: var(--secondary);
+            margin-top: 0;
+            transition: all 0.3s;
+        }
+        
+        .event-card:hover .event-title {
+            text-shadow: 0 0 8px rgba(255, 69, 0, 0.3);
+        }
+        
+        .event-date {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .trophy-icon {
+            display: inline-block;
+            margin-left: 5px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">BL</div>
+                <h1>Brawl Leagues</h1>
+            </div>
+            <div class="last-update">
+                Atualizado: <span id="update-date">24/06/2025 15:30</span>
+            </div>
+        </header>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total de Troféus</h3>
+                <div class="stat-value">3,842,156 <span class="trophy-icon">🏆</span></div>
+                <div class="trend-up">↑ 5.2% no último mês</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Amistosos</h3>
+                <div class="stat-value">128 <span class="trophy-icon">⚔️</span></div>
+                <div>Total de horas: 64h</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Membros Ativos</h3>
+                <div class="stat-value">86 <span class="trophy-icon">👥</span></div>
+                <div class="trend-up">↑ 12 novos este mês</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Divisões</h3>
+                <div class="stat-value">4 <span class="trophy-icon">🛡️</span></div>
+                <div>Luminous, Valyrian, Dragon's, Crown's</div>
+            </div>
+        </div>
+        
+        <div class="divisions">
+            <h2>Divisões <span class="trophy-icon">🏅</span></h2>
+            
+            <div class="division-card">
+                <div class="division-name">Luminous League</div>
+                <div class="division-trophies">1,548,272 <span class="trend-up">(+3.1%)</span></div>
+            </div>
+            
+            <div class="division-card">
+                <div class="division-name">Valyrian League</div>
+                <div class="division-trophies">785,213 <span class="trend-down">(-1.2%)</span></div>
+            </div>
+            
+            <div class="division-card">
+                <div class="division-name">Dragon's League</div>
+                <div class="division-trophies">672,459 <span class="trend-up">(+7.8%)</span></div>
+            </div>
+            
+            <div class="division-card">
+                <div class="division-name">Crown's League</div>
+                <div class="division-trophies">572,243 <span class="trend-up">(+2.4%)</span></div>
+            </div>
+        </div>
+        
+        <div class="events">
+            <h2>Eventos Ativos <span class="trophy-icon">🎯</span></h2>
+            
+            <div class="event-card">
+                <h3 class="event-title">Torneio de Verão 2025</h3>
+                <div class="event-date">25/06/2025 - 30/06/2025</div>
+                <p>Eliminação única entre as 4 divisões. Premiação para os 3 primeiros lugares.</p>
+                <div class="trend-up" style="font-size: 0.9rem;">Inscrições abertas!</div>
+            </div>
+            
+            <div class="event-card">
+                <h3 class="event-title">Maratona de Combate</h3>
+                <div class="event-date">Até 28/06/2025</div>
+                <p>Acumule pontos por eliminações e classificação em modo Combate Solo.</p>
+                <div class="trend-up" style="font-size: 0.9rem;">10 participantes ativos</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Atualiza a data automaticamente
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            document.getElementById('update-date').textContent = 
+                now.toLocaleDateString('pt-BR', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 60000); // Atualiza a cada minuto
+        
+        // Efeito de digitação para os valores
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = formatNumber(value);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        // Formatador de números
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        
+        // Anima os valores quando a página carrega
+        document.addEventListener('DOMContentLoaded', () => {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach((el, index) => {
+                const target = index === 0 ? 3842156 : 
+                              index === 1 ? 128 : 
+                              index === 2 ? 86 : 4;
+                animateValue(el, 0, target, 1500);
+            });
+        });
+        
+        // Efeito de hover nos cards de divisão
+        const divisionCards = document.querySelectorAll('.division-card');
+        divisionCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const trend = card.querySelector('.trend-up, .trend-down');
+                if (trend) {
+                    trend.style.transform = 'scale(1.2)';
+                    trend.style.transition = 'transform 0.3s';
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                const trend = card.querySelector('.trend-up, .trend-down');
+                if (trend) {
+                    trend.style.transform = 'scale(1)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
