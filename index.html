@@ -3,427 +3,725 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brawl Leagues - Dashboard</title>
+    <title>Brawl Leagues Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #121212;
-            --card-bg: #1e1e1e;
-            --primary: #ffd700;
-            --secondary: #ff4500;
-            --text: #ffffff;
-            --success: #4caf50;
-            --danger: #f44336;
-        }
-        
-        * {
-            box-sizing: border-box;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
+            --primary: #FFD700;
+            --secondary: #FF4500;
+            --dark: #121212;
+            --card-bg: #1E1E1E;
+            --success: #4CAF50;
+            --danger: #F44336;
         }
         
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+            background-color: var(--dark);
+            color: white;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            animation: fadeIn 0.8s ease-out;
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
         }
         
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--primary);
-            position: relative;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
-            opacity: 0.7;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
             transition: transform 0.3s;
         }
         
-        .logo:hover {
-            transform: scale(1.05);
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background-color: var(--primary);
-            border-radius: 50%;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-weight: bold;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
-        
-        h1 {
-            color: var(--primary);
-            margin: 0;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-            transition: all 0.3s;
-        }
-        
-        h1:hover {
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .stat-card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 0.5s ease-out forwards;
-            opacity: 0;
-        }
-        
-        .stat-card:nth-child(1) { animation-delay: 0.2s; }
-        .stat-card:nth-child(2) { animation-delay: 0.4s; }
-        .stat-card:nth-child(3) { animation-delay: 0.6s; }
-        .stat-card:nth-child(4) { animation-delay: 0.8s; }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,69,0,0.05) 100%);
-            z-index: 0;
-        }
-        
-        .stat-card:hover {
+        .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-        
-        .stat-card h3 {
-            color: var(--primary);
-            margin-top: 0;
-            position: relative;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 10px 0;
-            position: relative;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
         }
         
         .trend-up {
             color: var(--success);
-            font-weight: bold;
         }
         
         .trend-down {
             color: var(--danger);
-            font-weight: bold;
         }
         
-        .divisions {
-            margin-top: 40px;
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        .division-card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .division-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 3px;
-            height: 100%;
-            background: var(--primary);
-            transition: width 0.3s;
-        }
-        
-        .division-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .division-card:hover::after {
-            width: 5px;
-        }
-        
-        .division-name {
-            font-weight: bold;
-            color: var(--primary);
-            position: relative;
-        }
-        
-        .division-trophies {
-            font-size: 1.2rem;
-            position: relative;
-        }
-        
-        .events {
-            margin-top: 40px;
-            animation: fadeIn 1s ease-out;
-        }
-        
-        .event-card {
-            background-color: var(--card-bg);
-            border-left: 4px solid var(--secondary);
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .event-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-            border-left-width: 6px;
-        }
-        
-        .event-title {
-            color: var(--secondary);
-            margin-top: 0;
-            transition: all 0.3s;
-        }
-        
-        .event-card:hover .event-title {
-            text-shadow: 0 0 8px rgba(255, 69, 0, 0.3);
-        }
-        
-        .event-date {
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-        
-        .trophy-icon {
+        .loading {
             display: inline-block;
-            margin-left: 5px;
-            animation: float 3s ease-in-out infinite;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
         }
         
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">BL</div>
-                <h1>Brawl Leagues</h1>
+<body class="min-h-screen">
+    <!-- Cabeçalho -->
+    <header class="bg-black py-4 px-6 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+                    BL
+                </div>
+                <h1 class="text-2xl font-bold text-yellow-500">Brawl Leagues Manager</h1>
             </div>
-            <div class="last-update">
-                Atualizado: <span id="update-date">24/06/2025 15:30</span>
-            </div>
-        </header>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total de Troféus</h3>
-                <div class="stat-value">3,842,156 <span class="trophy-icon">🏆</span></div>
-                <div class="trend-up">↑ 5.2% no último mês</div>
-            </div>
-            
-            <div class="stat-card">
-                <h3>Amistosos</h3>
-                <div class="stat-value">128 <span class="trophy-icon">⚔️</span></div>
-                <div>Total de horas: 64h</div>
-            </div>
-            
-            <div class="stat-card">
-                <h3>Membros Ativos</h3>
-                <div class="stat-value">86 <span class="trophy-icon">👥</span></div>
-                <div class="trend-up">↑ 12 novos este mês</div>
-            </div>
-            
-            <div class="stat-card">
-                <h3>Divisões</h3>
-                <div class="stat-value">4 <span class="trophy-icon">🛡️</span></div>
-                <div>Luminous, Valyrian, Dragon's, Crown's</div>
+            <div class="text-gray-400">
+                <span id="current-date"></span>
             </div>
         </div>
-        
-        <div class="divisions">
-            <h2>Divisões <span class="trophy-icon">🏅</span></h2>
+    </header>
+
+    <!-- Navegação -->
+    <nav class="bg-gray-900 py-3 sticky top-0 z-10">
+        <div class="container mx-auto flex overflow-x-auto space-x-1 px-4">
+            <button onclick="showTab('home')" class="tab-button active px-4 py-2 rounded-lg bg-yellow-500 text-black font-medium">
+                <i class="fas fa-home mr-2"></i>Início
+            </button>
+            <button onclick="showTab('divisions')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                <i class="fas fa-shield-alt mr-2"></i>Divisões
+            </button>
+            <button onclick="showTab('friendly')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                <i class="fas fa-handshake mr-2"></i>Amistosos
+            </button>
+            <button onclick="showTab('events')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                <i class="fas fa-calendar-alt mr-2"></i>Eventos
+            </button>
+            <button onclick="showTab('faq')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                <i class="fas fa-question-circle mr-2"></i>FAQ
+            </button>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto py-6 px-4">
+        <!-- Página Inicial -->
+        <div id="home" class="tab-content active">
+            <h2 class="text-2xl font-bold text-yellow-500 mb-6">Visão Geral</h2>
             
-            <div class="division-card">
-                <div class="division-name">Luminous League</div>
-                <div class="division-trophies">1,548,272 <span class="trend-up">(+3.1%)</span></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Card Troféus Totais -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Troféus Totais</h3>
+                        <i class="fas fa-trophy text-yellow-500 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2" id="total-trophies">
+                        <span class="loading"></span>
+                    </div>
+                    <div class="text-sm text-gray-400">Atualizado em: <span id="last-update">carregando...</span></div>
+                </div>
+                
+                <!-- Card Troféus Mês Anterior -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Mês Anterior</h3>
+                        <i class="fas fa-history text-blue-400 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2" id="last-month-trophies">
+                        <span class="loading"></span>
+                    </div>
+                    <div id="growth-container">
+                        <span class="loading"></span>
+                    </div>
+                </div>
+                
+                <!-- Card Clubes -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Clubes</h3>
+                        <i class="fas fa-users text-green-400 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2" id="total-clubs">4</div>
+                    <div class="text-sm">Ativos na comunidade</div>
+                </div>
+                
+                <!-- Card Membros -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Membros</h3>
+                        <i class="fas fa-user-friends text-purple-400 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2" id="total-members">
+                        <span class="loading"></span>
+                    </div>
+                    <div class="text-sm text-gray-400">Ativos este mês</div>
+                </div>
             </div>
             
-            <div class="division-card">
-                <div class="division-name">Valyrian League</div>
-                <div class="division-trophies">785,213 <span class="trend-down">(-1.2%)</span></div>
-            </div>
-            
-            <div class="division-card">
-                <div class="division-name">Dragon's League</div>
-                <div class="division-trophies">672,459 <span class="trend-up">(+7.8%)</span></div>
-            </div>
-            
-            <div class="division-card">
-                <div class="division-name">Crown's League</div>
-                <div class="division-trophies">572,243 <span class="trend-up">(+2.4%)</span></div>
+            <div class="card p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-yellow-500">Próximos Eventos</h3>
+                <div class="space-y-4" id="upcoming-events">
+                    <div class="flex items-center justify-center py-4">
+                        <span class="loading"></span>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="events">
-            <h2>Eventos Ativos <span class="trophy-icon">🎯</span></h2>
+
+        <!-- Divisões -->
+        <div id="divisions" class="tab-content">
+            <h2 class="text-2xl font-bold text-yellow-500 mb-6">Divisões</h2>
             
-            <div class="event-card">
-                <h3 class="event-title">Torneio de Verão 2025</h3>
-                <div class="event-date">25/06/2025 - 30/06/2025</div>
-                <p>Eliminação única entre as 4 divisões. Premiação para os 3 primeiros lugares.</p>
-                <div class="trend-up" style="font-size: 0.9rem;">Inscrições abertas!</div>
-            </div>
-            
-            <div class="event-card">
-                <h3 class="event-title">Maratona de Combate</h3>
-                <div class="event-date">Até 28/06/2025</div>
-                <p>Acumule pontos por eliminações e classificação em modo Combate Solo.</p>
-                <div class="trend-up" style="font-size: 0.9rem;">10 participantes ativos</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" id="divisions-container">
+                <div class="flex items-center justify-center col-span-2 py-8">
+                    <span class="loading"></span>
+                </div>
             </div>
         </div>
-    </div>
-    
+
+        <!-- Amistosos -->
+        <div id="friendly" class="tab-content">
+            <h2 class="text-2xl font-bold text-yellow-500 mb-6">Amistosos</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Estatísticas Gerais -->
+                <div class="card p-6 md:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4">Estatísticas Gerais</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="friendly-stats">
+                        <div class="flex items-center justify-center py-4">
+                            <span class="loading"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gráfico -->
+                <div class="card p-6 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="text-gray-400 mb-2">Evolução por Divisão</div>
+                        <div id="friendly-chart">
+                            <span class="loading"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ranking -->
+            <div class="card p-6">
+                <h3 class="text-xl font-semibold mb-4">Top 20 Jogadores em Amistosos</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full" id="players-ranking">
+                        <thead>
+                            <tr class="text-left border-b border-gray-700">
+                                <th class="pb-2">Posição</th>
+                                <th class="pb-2">Jogador</th>
+                                <th class="pb-2">Divisão</th>
+                                <th class="pb-2">Vitórias</th>
+                                <th class="pb-2">Participações</th>
+                                <th class="pb-2">Taxa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="py-8 text-center">
+                                    <span class="loading"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eventos -->
+        <div id="events" class="tab-content">
+            <h2 class="text-2xl font-bold text-yellow-500 mb-6">Eventos Ativos</h2>
+            
+            <!-- Dragon's League Event -->
+            <div class="card p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4">Dragon's League - 3ª Divisão</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full" id="dragon-event">
+                        <thead>
+                            <tr class="text-left border-b border-gray-700">
+                                <th class="pb-2">Nome</th>
+                                <th class="pb-2">Kills</th>
+                                <th class="pb-2">Classificação</th>
+                                <th class="pb-2">Pontuação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4" class="py-8 text-center">
+                                    <span class="loading"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-right text-sm text-gray-400 mt-2" id="dragon-event-update">
+                    Atualizado em: carregando...
+                </div>
+            </div>
+            
+            <!-- Valyrian Ascent Event -->
+            <div class="card p-6">
+                <h3 class="text-xl font-semibold mb-4">Valyrian Ascent - 2ª Divisão</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full" id="valyrian-event">
+                        <thead>
+                            <tr class="text-left border-b border-gray-700">
+                                <th class="pb-2">Nome</th>
+                                <th class="pb-2">Troféus Iniciais</th>
+                                <th class="pb-2">Troféus Finais</th>
+                                <th class="pb-2">Diferença</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4" class="py-8 text-center">
+                                    <span class="loading"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-right text-sm text-gray-400 mt-2" id="valyrian-event-update">
+                    Atualizado em: carregando...
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div id="faq" class="tab-content">
+            <h2 class="text-2xl font-bold text-yellow-500 mb-6">Perguntas Frequentes</h2>
+            
+            <div class="card p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-yellow-400">Hierarquia</h3>
+                <div class="space-y-4">
+                    <div class="border-l-4 border-yellow-500 pl-4 py-2">
+                        <h4 class="font-bold">Soberano</h4>
+                        <p class="text-gray-400">Líder geral da comunidade</p>
+                    </div>
+                    <div class="border-l-4 border-red-500 pl-4 py-2">
+                        <h4 class="font-bold">Conselheiros</h4>
+                        <p class="text-gray-400">Braço direito do Soberano</p>
+                    </div>
+                    <div class="border-l-4 border-blue-500 pl-4 py-2">
+                        <h4 class="font-bold">Altos Oficiais</h4>
+                        <p class="text-gray-400">ADM locais de cada divisão (mínimo 2)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-yellow-400">Relatório Mensal</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Coleta automática dos troféus</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Publicado no último domingo do mês</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Se seu nome não estiver, você entrou depois do último relatório</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>Jogadores com +75k troféus ou do Conselho estão isentos</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="card p-6">
+                <h3 class="text-xl font-semibold mb-4 text-yellow-400">Outras Dúvidas</h3>
+                <div class="space-y-4">
+                    <details class="border-b border-gray-700 pb-3">
+                        <summary class="font-medium cursor-pointer">Como pedir ajuda?</summary>
+                        <p class="text-gray-400 mt-2">Acesse o canal #suporte no nosso Discord e abra um ticket.</p>
+                    </details>
+                    <details class="border-b border-gray-700 pb-3">
+                        <summary class="font-medium cursor-pointer">Como saber minha divisão?</summary>
+                        <p class="text-gray-400 mt-2">Sua divisão é determinada pelo seu desempenho nos relatórios mensais.</p>
+                    </details>
+                    <details class="border-b border-gray-700 pb-3">
+                        <summary class="font-medium cursor-pointer">Quem são meus administradores?</summary>
+                        <p class="text-gray-400 mt-2">Cada divisão tem pelo menos 2 Altos Oficiais listados no canal #administração do Discord.</p>
+                    </details>
+                    <details class="border-b border-gray-700 pb-3">
+                        <summary class="font-medium cursor-pointer">Como participar de eventos?</summary>
+                        <p class="text-gray-400 mt-2">Fique atento aos anúncios no Discord e siga as instruções de inscrição.</p>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-black py-6 px-4 mt-8">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-bold text-yellow-500">Brawl Leagues Manager</h3>
+                    <p class="text-gray-400 text-sm">© 2025 Brawl Leagues. Todos os direitos reservados.</p>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <a href="https://www.instagram.com/brawlleaguesbr" target="_blank" class="text-gray-400 hover:text-yellow-500 transition">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@brawl.leagues" target="_blank" class="text-gray-400 hover:text-yellow-500 transition">
+                        <i class="fab fa-tiktok text-xl"></i>
+                    </a>
+                    <a href="https://discord.gg/6aQfmBwWXx" target="_blank" class="text-gray-400 hover:text-yellow-500 transition">
+                        <i class="fab fa-discord text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="text-center text-gray-500 text-xs mt-4">
+                <p>Siga a Brawl Leagues e nossos Criadores de Conteúdos nas redes Sociais</p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // Atualiza a data automaticamente
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric',
-                hour: '2-digit', 
-                minute: '2-digit' 
-            };
-            document.getElementById('update-date').textContent = 
-                now.toLocaleDateString('pt-BR', options);
+        // Configurações das planilhas
+        const SHEETS_CONFIG = {
+            // Planilha principal com dados gerais
+            main: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1031439616',
+                range: 'A1:Z100'
+            },
+            
+            // Dados das divisões
+            divisions: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '279248867',
+                range: 'A1:Z100'
+            },
+            
+            // Estatísticas de amistosos
+            friendlyStats: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '976364986',
+                range: 'A1:Z100'
+            },
+            
+            // Gráfico de amistosos
+            friendlyChart: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1925467386',
+                range: 'A1:Z100'
+            },
+            
+            // Evento Dragon's League
+            dragonEvent: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1303933144',
+                range: 'A1:Z100'
+            },
+            
+            // Evento Valyrian Ascent
+            valyrianEvent: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1426590796',
+                range: 'A1:Z100'
+            }
+        };
+        
+        // Função para buscar dados do Google Sheets
+        async function fetchSheetData(config) {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${config.sheetId}/gviz/tq?gid=${config.gid}&range=${config.range}`;
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                return json.table.rows;
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+                return null;
+            }
         }
         
-        updateDateTime();
-        setInterval(updateDateTime, 60000); // Atualiza a cada minuto
-        
-        // Efeito de digitação para os valores
-        function animateValue(element, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const value = Math.floor(progress * (end - start) + start);
-                element.textContent = formatNumber(value);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-        
-        // Formatador de números
+        // Função para formatar números com separadores
         function formatNumber(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
         
-        // Anima os valores quando a página carrega
-        document.addEventListener('DOMContentLoaded', () => {
-            const statValues = document.querySelectorAll('.stat-value');
-            statValues.forEach((el, index) => {
-                const target = index === 0 ? 3842156 : 
-                              index === 1 ? 128 : 
-                              index === 2 ? 86 : 4;
-                animateValue(el, 0, target, 1500);
-            });
-        });
+        // Função para calcular diferença percentual
+        function calculateGrowth(current, previous) {
+            if (previous === 0) return { value: 0, percent: 0 };
+            const diff = current - previous;
+            const percent = ((diff / previous) * 100).toFixed(1);
+            return {
+                value: diff,
+                percent: percent
+            };
+        }
         
-        // Efeito de hover nos cards de divisão
-        const divisionCards = document.querySelectorAll('.division-card');
-        divisionCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                const trend = card.querySelector('.trend-up, .trend-down');
-                if (trend) {
-                    trend.style.transform = 'scale(1.2)';
-                    trend.style.transition = 'transform 0.3s';
+        // Função para atualizar dados gerais
+        async function updateGeneralData() {
+            const data = await fetchSheetData(SHEETS_CONFIG.main);
+            if (!data) return;
+            
+            // Exemplo de como extrair dados - ajuste conforme sua planilha real
+            const totalTrophies = parseInt(data[0].c[0].v);
+            const lastMonthTrophies = parseInt(data[1].c[0].v);
+            const totalMembers = parseInt(data[2].c[0].v);
+            
+            const growth = calculateGrowth(totalTrophies, lastMonthTrophies);
+            
+            document.getElementById('total-trophies').textContent = formatNumber(totalTrophies);
+            document.getElementById('last-month-trophies').textContent = formatNumber(lastMonthTrophies);
+            document.getElementById('total-members').textContent = formatNumber(totalMembers);
+            
+            const growthContainer = document.getElementById('growth-container');
+            growthContainer.innerHTML = `
+                <div class="${growth.percent >= 0 ? 'trend-up' : 'trend-down'} flex items-center">
+                    <i class="fas fa-arrow-${growth.percent >= 0 ? 'up' : 'down'} mr-1"></i>
+                    <span>${Math.abs(growth.percent)}% crescimento</span>
+                </div>
+            `;
+            
+            // Atualiza a data
+            const now = new Date();
+            document.getElementById('last-update').textContent = now.toLocaleDateString('pt-BR');
+        }
+        
+        // Função para atualizar dados das divisões
+        async function updateDivisionsData() {
+            const data = await fetchSheetData(SHEETS_CONFIG.divisions);
+            if (!data) return;
+            
+            const container = document.getElementById('divisions-container');
+            container.innerHTML = '';
+            
+            // Exemplo - ajuste conforme sua planilha real
+            const divisions = [
+                {
+                    name: "1ª Divisão - Luminous League",
+                    icon: "fa-crown",
+                    color: "text-yellow-300",
+                    current: 1548272,
+                    previous: 1502208
+                },
+                {
+                    name: "2ª Divisão - Valyrian League",
+                    icon: "fa-shield-alt",
+                    color: "text-red-300",
+                    current: 785213,
+                    previous: 794876
+                },
+                {
+                    name: "3ª Divisão - Dragon's League",
+                    icon: "fa-dragon",
+                    color: "text-green-300",
+                    current: 672459,
+                    previous: 623803
+                },
+                {
+                    name: "4ª Divisão - Crown's League",
+                    icon: "fa-gem",
+                    color: "text-purple-300",
+                    current: 572243,
+                    previous: 558998
                 }
+            ];
+            
+            divisions.forEach(div => {
+                const growth = calculateGrowth(div.current, div.previous);
+                
+                const divCard = document.createElement('div');
+                divCard.className = 'card p-6';
+                divCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold ${div.color}">${div.name}</h3>
+                        <i class="fas ${div.icon} ${div.color}"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-gray-400">Troféus Atuais:</span>
+                            <span class="text-2xl font-bold ml-2">${formatNumber(div.current)}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">Mês Anterior:</span>
+                            <span class="text-xl ml-2">${formatNumber(div.previous)}</span>
+                        </div>
+                        <div class="${growth.percent >= 0 ? 'trend-up' : 'trend-down'}">
+                            <i class="fas fa-arrow-${growth.percent >= 0 ? 'up' : 'down'} mr-1"></i>
+                            <span>${growth.value >= 0 ? '+' : ''}${formatNumber(growth.value)} (${growth.percent >= 0 ? '+' : ''}${growth.percent}%)</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(divCard);
+            });
+        }
+        
+        // Função para atualizar dados de amistosos
+        async function updateFriendlyData() {
+            const statsData = await fetchSheetData(SHEETS_CONFIG.friendlyStats);
+            const chartData = await fetchSheetData(SHEETS_CONFIG.friendlyChart);
+            
+            if (statsData) {
+                // Atualiza estatísticas - ajuste conforme sua planilha
+                document.getElementById('friendly-stats').innerHTML = `
+                    <div>
+                        <div class="text-gray-400 text-sm">Minutos Jogados</div>
+                        <div class="text-2xl font-bold">${formatNumber(3840)}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-sm">Total de Entradas</div>
+                        <div class="text-2xl font-bold">${formatNumber(128)}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-sm">Amistosos Externos</div>
+                        <div class="text-2xl font-bold">${formatNumber(24)}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-sm">Vitórias Externas</div>
+                        <div class="text-2xl font-bold">${formatNumber(15)}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-sm">Taxa de Vitórias</div>
+                        <div class="text-2xl font-bold">62.5%</div>
+                    </div>
+                `;
+            }
+            
+            if (chartData) {
+                // Aqui você pode implementar a criação do gráfico
+                document.getElementById('friendly-chart').innerHTML = `
+                    <div class="text-sm text-gray-500">Gráfico será implementado com dados reais</div>
+                `;
+            }
+            
+            // Atualiza ranking de jogadores - exemplo estático
+            const rankingTable = document.getElementById('players-ranking').querySelector('tbody');
+            rankingTable.innerHTML = '';
+            
+            for (let i = 1; i <= 20; i++) {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-800';
+                row.innerHTML = `
+                    <td class="py-3">${i}</td>
+                    <td>Jogador ${i}</td>
+                    <td>Divisão ${Math.ceil(i/5)}</td>
+                    <td>${30 - i}</td>
+                    <td>${35 - i}</td>
+                    <td class="${i % 3 === 0 ? 'trend-down' : 'trend-up'}">${(85 - i)}%</td>
+                `;
+                rankingTable.appendChild(row);
+            }
+        }
+        
+        // Função para atualizar dados de eventos
+        async function updateEventsData() {
+            const dragonData = await fetchSheetData(SHEETS_CONFIG.dragonEvent);
+            const valyrianData = await fetchSheetData(SHEETS_CONFIG.valyrianEvent);
+            
+            if (dragonData) {
+                const table = document.getElementById('dragon-event').querySelector('tbody');
+                table.innerHTML = '';
+                
+                // Exemplo - ajuste conforme sua planilha
+                for (let i = 0; i < Math.min(5, dragonData.length); i++) {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-800';
+                    row.innerHTML = `
+                        <td class="py-3">Jogador ${i+1}</td>
+                        <td>${15 + i}</td>
+                        <td>${i+1}</td>
+                        <td>${100 + (i * 25)}</td>
+                    `;
+                    table.appendChild(row);
+                }
+                
+                document.getElementById('dragon-event-update').textContent = `Atualizado em: ${new Date().toLocaleDateString('pt-BR')}`;
+            }
+            
+            if (valyrianData) {
+                const table = document.getElementById('valyrian-event').querySelector('tbody');
+                table.innerHTML = '';
+                
+                // Exemplo - ajuste conforme sua planilha
+                for (let i = 0; i < Math.min(5, valyrianData.length); i++) {
+                    const initial = 50000 + (i * 1000);
+                    const final = initial + 2000 + (i * 500);
+                    const diff = final - initial;
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-800';
+                    row.innerHTML = `
+                        <td class="py-3">Jogador ${i+1}</td>
+                        <td>${formatNumber(initial)}</td>
+                        <td>${formatNumber(final)}</td>
+                        <td class="${diff >= 0 ? 'trend-up' : 'trend-down'}">${diff >= 0 ? '+' : ''}${formatNumber(diff)}</td>
+                    `;
+                    table.appendChild(row);
+                }
+                
+                document.getElementById('valyrian-event-update').textContent = `Atualizado em: ${new Date().toLocaleDateString('pt-BR')}`;
+            }
+        }
+        
+        // Função para alternar entre abas
+        function showTab(tabId) {
+            // Esconde todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
             });
             
-            card.addEventListener('mouseleave', () => {
-                const trend = card.querySelector('.trend-up, .trend-down');
-                if (trend) {
-                    trend.style.transform = 'scale(1)';
-                }
+            // Mostra a aba selecionada
+            document.getElementById(tabId).classList.add('active');
+            
+            // Atualiza botões ativos
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('bg-yellow-500', 'text-black');
+                btn.classList.add('hover:bg-gray-700', 'text-white');
             });
+            
+            event.currentTarget.classList.add('bg-yellow-500', 'text-black');
+            event.currentTarget.classList.remove('hover:bg-gray-700', 'text-white');
+        }
+        
+        // Atualiza a data atual
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('pt-BR', options);
+        }
+        
+        // Carrega todos os dados quando a página é carregada
+        window.addEventListener('DOMContentLoaded', () => {
+            updateCurrentDate();
+            updateGeneralData();
+            updateDivisionsData();
+            updateFriendlyData();
+            updateEventsData();
+            
+            // Atualiza os dados a cada 5 minutos
+            setInterval(() => {
+                updateGeneralData();
+                updateDivisionsData();
+                updateFriendlyData();
+                updateEventsData();
+            }, 300000);
         });
     </script>
 </body>
 </html>
+
+
+
