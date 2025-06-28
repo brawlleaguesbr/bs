@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Leagues Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --primary: #ffd700;
+            --secondary: #ff4500;
+            --text: #ffffff;
+            --success: #4caf50;
+            --danger: #f44336;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    <div class="container mx-auto">
+        <!-- Cabeçalho -->
+        <header class="py-4 px-6 border-b border-yellow-500">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+                        BL
+                    </div>
+                    <h1 class="text-2xl font-bold text-yellow-500">Brawl Leagues Manager</h1>
+                </div>
+                <div class="text-gray-400" id="current-date"></div>
+            </div>
+        </header>
+
+        <!-- Navegação -->
+        <nav class="bg-gray-900 py-3 sticky top-0 z-10">
+            <div class="flex overflow-x-auto space-x-1 px-4">
+                <button onclick="showTab('home')" class="tab-button active px-4 py-2 rounded-lg bg-yellow-500 text-black font-medium">
+                    <i class="fas fa-home mr-2"></i>Início
+                </button>
+                <button onclick="showTab('divisions')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                    <i class="fas fa-shield-alt mr-2"></i>Divisões
+                </button>
+                <button onclick="showTab('friendly')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                    <i class="fas fa-handshake mr-2"></i>Amistosos
+                </button>
+                <button onclick="showTab('events')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                    <i class="fas fa-calendar-alt mr-2"></i>Eventos
+                </button>
+                <button onclick="showTab('faq')" class="tab-button px-4 py-2 rounded-lg hover:bg-gray-700 text-white font-medium">
+                    <i class="fas fa-question-circle mr-2"></i>FAQ
+                </button>
+            </div>
+        </nav>
+
+        <!-- Conteúdo Principal -->
+        <main class="py-6 px-4">
+            <!-- Página Inicial -->
+            <div id="home" class="tab-content active">
+                <h2 class="text-2xl font-bold text-yellow-500 mb-6">Visão Geral</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="home-stats">
+                    <!-- Dados serão inseridos via JavaScript -->
+                    <div class="flex items-center justify-center col-span-4 py-12">
+                        <span class="loading"></span>
+                    </div>
+                </div>
+                
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-500">Próximos Eventos</h3>
+                    <div class="space-y-4" id="upcoming-events">
+                        <div class="flex items-center justify-center py-4">
+                            <span class="loading"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divisões -->
+            <div id="divisions" class="tab-content">
+                <h2 class="text-2xl font-bold text-yellow-500 mb-6">Divisões</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" id="divisions-container">
+                    <div class="flex items-center justify-center col-span-2 py-12">
+                        <span class="loading"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amistosos -->
+            <div id="friendly" class="tab-content">
+                <h2 class="text-2xl font-bold text-yellow-500 mb-6">Amistosos</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Estatísticas Gerais -->
+                    <div class="card p-6 md:col-span-2">
+                        <h3 class="text-xl font-semibold mb-4">Estatísticas Gerais</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="friendly-stats">
+                            <div class="flex items-center justify-center py-4">
+                                <span class="loading"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico -->
+                    <div class="card p-6 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="text-gray-400 mb-2">Evolução por Divisão</div>
+                            <div id="friendly-chart">
+                                <span class="loading"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ranking -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-4">Top 20 Jogadores em Amistosos</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full" id="players-ranking">
+                            <thead>
+                                <tr class="text-left border-b border-gray-700">
+                                    <th class="pb-2">Posição</th>
+                                    <th class="pb-2">Jogador</th>
+                                    <th class="pb-2">Divisão</th>
+                                    <th class="pb-2">Vitórias</th>
+                                    <th class="pb-2">Participações</th>
+                                    <th class="pb-2">Taxa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center">
+                                        <span class="loading"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eventos -->
+            <div id="events" class="tab-content">
+                <h2 class="text-2xl font-bold text-yellow-500 mb-6">Eventos Ativos</h2>
+                
+                <!-- Dragon's League Event -->
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Dragon's League - 3ª Divisão</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full" id="dragon-event">
+                            <thead>
+                                <tr class="text-left border-b border-gray-700">
+                                    <th class="pb-2">Nome</th>
+                                    <th class="pb-2">Kills</th>
+                                    <th class="pb-2">Classificação</th>
+                                    <th class="pb-2">Pontuação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="py-8 text-center">
+                                        <span class="loading"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-right text-sm text-gray-400 mt-2" id="dragon-event-update">
+                        Atualizado em: carregando...
+                    </div>
+                </div>
+                
+                <!-- Valyrian Ascent Event -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-4">Valyrian Ascent - 2ª Divisão</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full" id="valyrian-event">
+                            <thead>
+                                <tr class="text-left border-b border-gray-700">
+                                    <th class="pb-2">Nome</th>
+                                    <th class="pb-2">Troféus Iniciais</th>
+                                    <th class="pb-2">Troféus Finais</th>
+                                    <th class="pb-2">Diferença</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="py-8 text-center">
+                                        <span class="loading"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-right text-sm text-gray-400 mt-2" id="valyrian-event-update">
+                        Atualizado em: carregando...
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div id="faq" class="tab-content">
+                <h2 class="text-2xl font-bold text-yellow-500 mb-6">Perguntas Frequentes</h2>
+                
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-400">Hierarquia</h3>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-yellow-500 pl-4 py-2">
+                            <h4 class="font-bold">Soberano</h4>
+                            <p class="text-gray-400">Líder geral da comunidade</p>
+                        </div>
+                        <div class="border-l-4 border-red-500 pl-4 py-2">
+                            <h4 class="font-bold">Conselheiros</h4>
+                            <p class="text-gray-400">Braço direito do Soberano</p>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <h4 class="font-bold">Altos Oficiais</h4>
+                            <p class="text-gray-400">ADM locais de cada divisão (mínimo 2)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-6 mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-400">Relatório Mensal</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Coleta automática dos troféus</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Publicado no último domingo do mês</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Se seu nome não estiver, você entrou depois do último relatório</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>Jogadores com +75k troféus ou do Conselho estão isentos</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-400">Outras Dúvidas</h3>
+                    <div class="space-y-4">
+                        <details class="border-b border-gray-700 pb-3">
+                            <summary class="font-medium cursor-pointer">Como pedir ajuda?</summary>
+                            <p class="text-gray-400 mt-2">Acesse o canal #suporte no nosso Discord e abra um ticket.</p>
+                        </details>
+                        <details class="border-b border-gray-700 pb-3">
+                            <summary class="font-medium cursor-pointer">Como saber minha divisão?</summary>
+                            <p class="text-gray-400 mt-2">Sua divisão é determinada pelo seu desempenho nos relatórios mensais.</p>
+                        </details>
+                        <details class="border-b border-gray-700 pb-3">
+                            <summary class="font-medium cursor-pointer">Quem são meus administradores?</summary>
+                            <p class="text-gray-400 mt-2">Cada divisão tem pelo menos 2 Altos Oficiais listados no canal #administração do Discord.</p>
+                        </details>
+                        <details class="border-b border-gray-700 pb-3">
+                            <summary class="font-medium cursor-pointer">Como participar de eventos?</summary>
+                            <p class="text-gray-400 mt-2">Fique atento aos anúncios no Discord e siga as instruções de inscrição.</p>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Rodapé -->
+        <footer class="bg-gray-900 py-6 px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-bold text-yellow-500">Brawl Leagues Manager</h3>
+                    <p class="text-gray-400 text-sm">© 2025 Brawl Leagues. Todos os direitos reservados.</p>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <a href="https://www.instagram.com/brawlleaguesbr" target="_blank" class="text-gray-400 hover:text-yellow-500 transition">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@brawl.leagues" target="_blank" class="text-gray-400 hover:text-yellow-500 transition">
+                        <i class="fab fa-tiktok text-xl"></i>
+                    </a>
+                    <a href="https://discord.gg/6aQfmBwWXx" target="_blank" class="text-gray-400 hover:text-yellow-500 transition">
+                        <i class="fab fa-discord text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="text-center text-gray-500 text-xs mt-4">
+                <p>Siga a Brawl Leagues e nossos Criadores de Conteúdos nas redes Sociais</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Configurações das planilhas
+        const SHEETS_CONFIG = {
+            main: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1031439616',
+                range: 'A1:Z100'
+            },
+            divisions: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '279248867',
+                range: 'A1:Z100'
+            },
+            friendlyStats: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '976364986',
+                range: 'A1:Z100'
+            },
+            friendlyChart: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1925467386',
+                range: 'A1:Z100'
+            },
+            dragonEvent: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1303933144',
+                range: 'A1:Z100'
+            },
+            valyrianEvent: {
+                sheetId: '1DHY3yb-yq1Liq7OU8A-90J_82YbT_rpG7ZYIwKD2tMQ',
+                gid: '1426590796',
+                range: 'A1:Z100'
+            }
+        };
+        
+        // Função para alternar entre abas
+        function showTab(tabId) {
+            // Esconde todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostra a aba selecionada
+            document.getElementById(tabId).classList.add('active');
+            
+            // Atualiza botões ativos
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('bg-yellow-500', 'text-black');
+                btn.classList.add('hover:bg-gray-700', 'text-white');
+            });
+            
+            event.currentTarget.classList.add('bg-yellow-500', 'text-black');
+            event.currentTarget.classList.remove('hover:bg-gray-700', 'text-white');
+            
+            // Carrega os dados da aba se necessário
+            if (tabId === 'home') loadHomeData();
+            if (tabId === 'divisions') loadDivisionsData();
+            if (tabId === 'friendly') loadFriendlyData();
+            if (tabId === 'events') loadEventsData();
+        }
+        
+        // Função para buscar dados do Google Sheets
+        async function fetchSheetData(config) {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${config.sheetId}/gviz/tq?gid=${config.gid}&range=${config.range}`;
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substr(47).slice(0, -2));
+                return json.table.rows;
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+                return null;
+            }
+        }
+        
+        // Função para formatar números com separadores
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        
+        // Função para calcular diferença percentual
+        function calculateGrowth(current, previous) {
+            if (previous === 0) return { value: 0, percent: 0 };
+            const diff = current - previous;
+            const percent = ((diff / previous) * 100).toFixed(1);
+            return {
+                value: diff,
+                percent: percent
+            };
+        }
+        
+        // Função para carregar dados da página inicial
+        async function loadHomeData() {
+            const data = await fetchSheetData(SHEETS_CONFIG.main);
+            if (!data) return;
+            
+            // Exemplo de como extrair dados - ajuste conforme sua planilha real
+            const totalTrophies = parseInt(data[0].c[0].v);
+            const lastMonthTrophies = parseInt(data[1].c[0].v);
+            const totalMembers = parseInt(data[2].c[0].v);
+            const totalClubs = 4; // Ajuste conforme sua planilha
+            
+            const growth = calculateGrowth(totalTrophies, lastMonthTrophies);
+            
+            document.getElementById('home-stats').innerHTML = `
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Troféus Totais</h3>
+                        <i class="fas fa-trophy text-yellow-500 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2">${formatNumber(totalTrophies)}</div>
+                    <div class="text-sm text-gray-400">Atualizado em: ${new Date().toLocaleDateString('pt-BR')}</div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Mês Anterior</h3>
+                        <i class="fas fa-history text-blue-400 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2">${formatNumber(lastMonthTrophies)}</div>
+                    <div class="${growth.percent >= 0 ? 'trend-up' : 'trend-down'} flex items-center">
+                        <i class="fas fa-arrow-${growth.percent >= 0 ? 'up' : 'down'} mr-1"></i>
+                        <span>${Math.abs(growth.percent)}%</span>
+                    </div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Clubes</h3>
+                        <i class="fas fa-users text-green-400 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2">${totalClubs}</div>
+                    <div class="text-sm">Ativos na comunidade</div>
+                </div>
+                
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Membros</h3>
+                        <i class="fas fa-user-friends text-purple-400 text-xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold mb-2">${formatNumber(totalMembers)}</div>
+                    <div class="trend-up flex items-center text-sm">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        <span>+12 este mês</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Funções para carregar outras abas (loadDivisionsData, loadFriendlyData, loadEventsData)
+        // Implementação similar com conexão às respectivas planilhas
+        
+        // Atualiza a data atual
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('pt-BR', options);
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCurrentDate();
+            loadHomeData();
+            
+            // Atualiza a data a cada minuto
+            setInterval(updateCurrentDate, 60000);
+        });
+    </script>
+</body>
+</html>
+
+
